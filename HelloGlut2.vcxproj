@@ -147,8 +147,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="HelloGlut2.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\ShaderHandler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\shaders\FragmentShader.txt" />
+    <Text Include="res\shaders\VertexShader.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ShaderHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

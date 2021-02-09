@@ -1,9 +1,14 @@
 #include <iostream>
 #include <GL/glew.h>
+#include <GL/glut.h>
 #include <GLFW/glfw3.h>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include "ShaderHandler.h"
 
-int main(void)
-{
+
+int main(){
     GLFWwindow* window;
 
     /* Initialize the library */
@@ -33,12 +38,17 @@ int main(void)
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions,GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     //vertex attribute pointer hints
     //(starting point, number of values, type of values, normalize?[0-1],size of a vertex, offset between vertex attributes)
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+    
+    ShaderHandler shaderHandler;
+    unsigned int shader = shaderHandler.getProgram();
+    glUseProgram(shader);
+
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)){
@@ -54,6 +64,8 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
+
+    glDeleteProgram(shader);
 
     glfwTerminate();
     return 0;
