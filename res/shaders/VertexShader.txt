@@ -1,7 +1,26 @@
 #version 330 core
 
-layout(location = 0) in vec4 position;
+layout(location = 0) in vec3 aPos;
+
+uniform mat4 modelViewMatrix = mat4(1.0, 0.0, 0.0, 0.0,
+                                    0.0, 1.0, 0.0, 0.0,
+                                    0.0, 0.0, 1.0, 0.0,
+                                    0.0, 0.0, 0.0, 1.0);
+
+uniform mat4 projectionMatrix = mat4(1.0, 0.0, 0.0, 0.0,
+                                     0.0, 1.0, 0.0, 0.0,
+                                     0.0, 0.0, 1.0, 0.0,
+                                     0.0, 0.0, 0.0, 1.0);
 
 void main(){
-    gl_Position = position;
+    //modelMatrix: moves vertex from local to world space
+    //viewMatrix: moves vertex from world space to camera view
+    //  [ux, uy, uz, -u.x]
+    //  [vx, vy, vz, -v.y]
+    //  [nx, ny, nz, -n.z]
+    //  [ 0,  0,  0,  1  ]
+    //so modelView is the combo of model and view
+    //projectionMatrix: moves the vertex to clip space screen co-ords
+
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(aPos,1.0);
 };

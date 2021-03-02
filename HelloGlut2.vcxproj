@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependancies\GLFW\include;%(AdditionalIncludeDirectories);$(SolutionDir)Dependancies\GLEW_2.1.0\include;$(SolutionDir)Dependancies\freeglut\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependancies\GLFW\include;%(AdditionalIncludeDirectories);$(SolutionDir)Dependancies\GLEW_2.1.0\include;$(SolutionDir)Dependancies\freeglut\include;$(SolutionDir)Dependancies\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,7 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependancies\GLFW\include;%(AdditionalIncludeDirectories);$(SolutionDir)Dependancies\GLEW_2.1.0\include;$(SolutionDir)Dependancies\freeglut\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependancies\GLFW\include;%(AdditionalIncludeDirectories);$(SolutionDir)Dependancies\GLEW_2.1.0\include;$(SolutionDir)Dependancies\freeglut\include;$(SolutionDir)Dependancies\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,15 +147,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MeshLoader.cpp" />
     <ClCompile Include="src\ShaderHandler.cpp" />
+    <ClCompile Include="src\VertexBuffer.cpp" />
+    <ClCompile Include="src\Transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="res\shaders\FragmentShader.txt" />
     <Text Include="res\shaders\VertexShader.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\MeshLoader.h" />
     <ClInclude Include="src\ShaderHandler.h" />
+    <ClInclude Include="src\VertexBuffer.h" />
+    <ClInclude Include="src\Transformation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

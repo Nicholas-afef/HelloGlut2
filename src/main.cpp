@@ -1,63 +1,65 @@
 #include <iostream>
 #include <GL/glew.h>
-#include <GL/glut.h>
 #include <GLFW/glfw3.h>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include "ShaderHandler.h"
+#include "MeshLoader.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "Matrix.h"
 
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
-int main(){
-    GLFWwindow* window;
+void display(GLFWwindow*);
+GLFWwindow* windowInit(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT);
 
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-
-    if (glewInit() != GLEW_OK)
+int main(int argc, char** argv) {
+    GLFWwindow* window = windowInit(SCREEN_WIDTH, SCREEN_HEIGHT);
+    if (glewInit() != GLEW_OK) {
         std::cout << "Glewinit error";
+    }
+    if (window != NULL){
+        display(window);
+    }
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return 0;
+}
 
-    float positions[6] = {
-        -0.5f, -0.5f,
-        0.0f, 0.5f,
-        0.5f, -0.5f
-    };
+void display(GLFWwindow* window) {
 
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    //this is currently the object we're displaying
+    MeshLoader mesh("mesh/cube.obj", 3);
 
+    //these are our buffers the meshloader loads into to bind our vertices and indices
+    VertexBuffer vb(mesh.getVertexBuffer(), mesh.vertexBufferSize());
+    IndexBuffer ib(mesh.getIndexBuffer(), mesh.indexBufferSize());
+
+    //defines the attributes of our vertices in the buffer
     glEnableVertexAttribArray(0);
-    //vertex attribute pointer hints
-    //(starting point, number of values, type of values, normalize?[0-1],size of a vertex, offset between vertex attributes)
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
     ShaderHandler shaderHandler;
-    unsigned int shader = shaderHandler.getProgram();
-    glUseProgram(shader);
-
-
+    shaderHandler.useShader();
+    shaderHandler.setUni4f("inColor", 0.0f, 1.0f, 0.0f, 1.0f);
+    
+    //modify our view to match our object
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window)){
+
+   /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window))
+    {
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glDrawArrays(GL_TRIANGLES, 0,3); //this will work for select graphics drivers if there is a default shader enabled
-
-
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        glDrawElements(GL_TRIANGLES, mesh.indexBufferSize(), GL_UNSIGNED_INT, nullptr);
+        
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
@@ -65,8 +67,33 @@ int main(){
         glfwPollEvents();
     }
 
-    glDeleteProgram(shader);
-
-    glfwTerminate();
-    return 0;
+    glDisableVertexAttribArray(0);
+    shaderHandler.~ShaderHandler();
+    vb.~VertexBuffer();
+    ib.~IndexBuffer();
 }
+
+GLFWwindow* windowInit(int width, int height) {
+    /* Initialize the library */
+    if (!glfwInit()) {
+        std::cout << "failstate: glfw failed to initialize";
+        return NULL;
+    }
+
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello World", NULL, NULL);
+
+    if (!window){
+        std::cout << "failstate: window failed to initialize";
+        glfwTerminate();
+        return NULL;
+    }
+
+    glfwMakeContextCurrent(window);
+
+    glEnable(GL_DEPTH_TEST); // Depth Testing
+    glDepthFunc(GL_LEQUAL);
+    glDisable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    return window;
+}
+
