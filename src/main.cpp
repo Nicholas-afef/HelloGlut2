@@ -59,12 +59,10 @@ void display(GLFWwindow* window) {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //glDrawArrays(GL_TRIANGLES, 0, 36);
-        vao.bind();
         shaderHandler.setRotate(rotAngle, glm::vec3(1.0, 1.0, 1.0));
         shaderHandler.updateModelView();
-        glDrawElements(GL_TRIANGLES, mesh.indexDataSize(), GL_UNSIGNED_INT, nullptr);
-        vao.unbind();
-        rotAngle += 0;
+        glDrawElements(GL_TRIANGLES, mesh.indexDataSize(), GL_UNSIGNED_INT, (void*)0);
+        rotAngle += 0.0;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
