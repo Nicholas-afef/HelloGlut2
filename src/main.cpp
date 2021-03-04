@@ -11,7 +11,7 @@
 #include "MeshLoader.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-
+#include "VertexArrayObj.h"
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
@@ -38,12 +38,11 @@ void display(GLFWwindow* window) {
     MeshLoader mesh("mesh/cube.obj", 3);
 
     //these are our buffers the meshloader loads into to bind our vertices and indices
-    VertexBuffer vb(mesh.getVertexData(), mesh.vertexDataSize());
-    IndexBuffer ib(mesh.getIndexData(), mesh.indexDataSize());
+    VertexArrayObj vao(mesh.getVertexData(), mesh.vertexDataSize(), mesh.getIndexData(), mesh.indexDataSize());
 
     //defines the attributes of our vertices in the buffer
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+    //glEnableVertexAttribArray(0);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
     ShaderHandler shaderHandler;
     shaderHandler.useShader();
@@ -60,12 +59,12 @@ void display(GLFWwindow* window) {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //glDrawArrays(GL_TRIANGLES, 0, 36);
-        
+        vao.bind();
         shaderHandler.setRotate(rotAngle, glm::vec3(1.0, 1.0, 1.0));
         shaderHandler.updateModelView();
         glDrawElements(GL_TRIANGLES, mesh.indexDataSize(), GL_UNSIGNED_INT, nullptr);
-
-        rotAngle += .01;
+        vao.unbind();
+        rotAngle += 0;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -76,8 +75,7 @@ void display(GLFWwindow* window) {
 
     glDisableVertexAttribArray(0);
     shaderHandler.~ShaderHandler();
-    vb.~VertexBuffer();
-    ib.~IndexBuffer();
+    vao.~VertexArrayObj();
 }
 
 GLFWwindow* windowInit(int width, int height) {
