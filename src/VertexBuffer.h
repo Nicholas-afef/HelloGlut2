@@ -1,9 +1,9 @@
 #pragma once
 #include<GL/glew.h>
-
+#include <iostream>
 class VertexBuffer {
 private:
-	unsigned int bufferId;
+	unsigned int vertexBufferId;
 public:
 	VertexBuffer(const void* data, unsigned int size);
 	~VertexBuffer();

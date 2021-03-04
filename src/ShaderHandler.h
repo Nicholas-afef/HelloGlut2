@@ -8,14 +8,19 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include "Matrix.h"
+#include "Transformation.h"
 
 class ShaderHandler {
+	/*		The shader handler is response for creating and transmitting data 
+		to and from our shaders. It does this by updating uniforms and at times
+		calculating necessary matrices to send to the shader.
+	*/
 private:
-	unsigned int program;
+	unsigned int shaderProgram;
 	std::string vertexShader;
 	std::string fragmentShader;
 	static std::string parseShader(const std::string&);
+	glm::mat4 translator, rotator, scalar, view;
 public:
 	ShaderHandler();
 	~ShaderHandler();
@@ -26,7 +31,11 @@ public:
 	void setBool(const std::string&, bool) const;
 	void setInt(const std::string&, int) const;
 	void setUni4f(const std::string&, float,float,float,float) const;
-	void setMatrix(const std::string&, Matrix);
-	void setMatrix(const std::string&, float*);
+	void setTranslate(glm::vec3);
+	void setScale(float);
+	void setRotate(float angle, glm::vec3 axisOfRotation);
+	void updateModelView();
+	void setView(glm::vec3 position, glm::vec3 nVec, glm::vec3 upVec);
+	void setPerspective(float angle, float screenWidth, float screenHeight, float near, float far);
 };
 #endif // !SHADERHANDLER_H

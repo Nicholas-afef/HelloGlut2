@@ -1,6 +1,7 @@
 #include "MeshLoader.h"
 
 MeshLoader::MeshLoader(const std::string& f, int dimension){
+	//define a file f (our mesh file) and load it. Dimension signifies the type of object we're loading
 	file = f;
 	if (dimension == 2) {
 		load2dFile();
@@ -11,8 +12,9 @@ MeshLoader::MeshLoader(const std::string& f, int dimension){
 }
 
 MeshLoader::~MeshLoader(){
-	vertexBuffer.clear();
-	indexBuffer.clear();
+	//clear our buffers
+	vertexData.clear();
+	indexData.clear();
 }
 
 void MeshLoader::load2dFile(){
@@ -24,16 +26,16 @@ void MeshLoader::load2dFile(){
 		if (line.c_str()[0] == 'v') {
 			float x, y;
 			sscanf_s(line.c_str(), "v %f %f", &x, &y);
-			vertexBuffer.push_back(x);
-			vertexBuffer.push_back(y);
+			vertexData.push_back(x);
+			vertexData.push_back(y);
 			std::cout << "v " << x << " " << y << std::endl;
 		}
 		if (line.c_str()[0] == 'f') {
 			int x, y, z;
 			sscanf_s(line.c_str(), "f\t%d\t%d\t%d", &x, &y, &z);
-			indexBuffer.push_back(x);
-			indexBuffer.push_back(y);
-			indexBuffer.push_back(z);
+			indexData.push_back(x);
+			indexData.push_back(y);
+			indexData.push_back(z);
 			std::cout << "f " << x << " " << y << " " << z << std::endl;
 		}
 	}
@@ -48,51 +50,56 @@ void MeshLoader::load3dFile() {
 		if (line.c_str()[0] == 'v') {
 			float x, y, z;
 			sscanf_s(line.c_str(), "v %f %f %f", &x, &y, &z);
-			vertexBuffer.push_back(x);
-			vertexBuffer.push_back(y);
-			vertexBuffer.push_back(z);
+			vertexData.push_back(x);
+			vertexData.push_back(y);
+			vertexData.push_back(z);
 			std::cout << "v " << x << " " << y << " " << z << std::endl;
 		}
 		if (line.c_str()[0] == 'f') {
 			unsigned int x, y, z;
 			sscanf_s(line.c_str(), "f\t%d\t%d\t%d", &x, &y, &z);
-			indexBuffer.push_back(x);
-			indexBuffer.push_back(y);
-			indexBuffer.push_back(z);
+			indexData.push_back(x);
+			indexData.push_back(y);
+			indexData.push_back(z);
 			std::cout << "f " << x << " " << y << " " << z << std::endl;
 		}
 	}
 	std::cout << "object loaded successfully" << std::endl;
-	std::cout << "object vertices: " << vertexBuffer.size() << "\t";
-	std::cout << "object Indices: " << indexBuffer.size();
+	std::cout << "object vertices: " << vertexData.size() << "\t";
+	std::cout << "object Indices: " << indexData.size() << std::endl;
 }
 
 
-float* MeshLoader::getVertexBuffer(){
-	return vertexBuffer.data();
+float* MeshLoader::getVertexData(){
+	return vertexData.data();
 }
 
-unsigned int* MeshLoader::getIndexBuffer(){
-	return indexBuffer.data();
+unsigned int* MeshLoader::getIndexData(){
+	return indexData.data();
 }
 
-int MeshLoader::vertexBufferSize(){
-	return vertexBuffer.size() * sizeof(float);
+int MeshLoader::vertexDataSize(){
+	//returns the size of the vertex data vector in bytes
+	return vertexData.size() * sizeof(float);
 }
 
-int MeshLoader::indexBufferSize(){
-	return indexBuffer.size();
+int MeshLoader::indexDataSize(){
+	//returns the size of the index data vector in bytes
+	return indexData.size();
 }
+
 
 void MeshLoader::reload(const std::string& f) {
 	//annihilate the previous object and load a new mesh file
-	vertexBuffer.clear();
-	indexBuffer.clear();
+	vertexData.clear();
+	indexData.clear();
 	file = f;
 	load2dFile();
 }
 
 void MeshLoader::toString() {
-	std::cout << vertexBufferSize() << std::endl;
-	std::cout << indexBufferSize() << std::endl;
+	std::cout << vertexDataSize() << std::endl;
+	std::cout << indexDataSize() << std::endl;
 }
+
+

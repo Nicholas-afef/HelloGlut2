@@ -8,8 +8,8 @@
 
 class MeshLoader{
 private:
-	std::vector<float> vertexBuffer;
-	std::vector<unsigned int> indexBuffer;
+	std::vector<float> vertexData;
+	std::vector<unsigned int> indexData;
 	std::string file;
 public:
 	MeshLoader(const std::string&, int);
@@ -18,10 +18,10 @@ public:
 	void reload(const std::string&);
 	void load2dFile();
 	void load3dFile();
-	float* getVertexBuffer();
-	unsigned int* getIndexBuffer();
-	int vertexBufferSize();
-	int indexBufferSize();
+	float* getVertexData();
+	unsigned int* getIndexData();
+	int vertexDataSize();
+	int indexDataSize();
 	void toString();
 };
 

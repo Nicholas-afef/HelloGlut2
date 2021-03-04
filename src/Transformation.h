@@ -8,8 +8,8 @@ private:
 	glm::mat4 tMatrix;
 public:
 	Transformation();
-	void translate(float, float, float);
-	void rotate(float, float, float, float);
+	void translate(glm::vec3);
+	void rotate(float, glm::vec3);
 	void scale(float);
 	glm::mat4 getMatrix();
 };

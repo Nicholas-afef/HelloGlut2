@@ -11,13 +11,13 @@
 #include "MeshLoader.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "Matrix.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 void display(GLFWwindow*);
 GLFWwindow* windowInit(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT);
+static float rotAngle = 5;
 
 int main(int argc, char** argv) {
     GLFWwindow* window = windowInit(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -38,8 +38,8 @@ void display(GLFWwindow* window) {
     MeshLoader mesh("mesh/cube.obj", 3);
 
     //these are our buffers the meshloader loads into to bind our vertices and indices
-    VertexBuffer vb(mesh.getVertexBuffer(), mesh.vertexBufferSize());
-    IndexBuffer ib(mesh.getIndexBuffer(), mesh.indexBufferSize());
+    VertexBuffer vb(mesh.getVertexData(), mesh.vertexDataSize());
+    IndexBuffer ib(mesh.getIndexData(), mesh.indexDataSize());
 
     //defines the attributes of our vertices in the buffer
     glEnableVertexAttribArray(0);
@@ -48,7 +48,9 @@ void display(GLFWwindow* window) {
     ShaderHandler shaderHandler;
     shaderHandler.useShader();
     shaderHandler.setUni4f("inColor", 0.0f, 1.0f, 0.0f, 1.0f);
-    
+    shaderHandler.setView(glm::vec3(0, 0, 0), glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 1.0, 0.0));
+    shaderHandler.setPerspective(55.0, SCREEN_WIDTH, SCREEN_HEIGHT, 1.0, 50.0);
+    shaderHandler.setTranslate(glm::vec3(0.0, 0.0, -1.0));
     //modify our view to match our object
     /* Loop until the user closes the window */
 
@@ -57,9 +59,14 @@ void display(GLFWwindow* window) {
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
         
-        glDrawElements(GL_TRIANGLES, mesh.indexBufferSize(), GL_UNSIGNED_INT, nullptr);
-        
+        shaderHandler.setRotate(rotAngle, glm::vec3(1.0, 1.0, 1.0));
+        shaderHandler.updateModelView();
+        glDrawElements(GL_TRIANGLES, mesh.indexDataSize(), GL_UNSIGNED_INT, nullptr);
+
+        rotAngle += .01;
+
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
@@ -93,7 +100,7 @@ GLFWwindow* windowInit(int width, int height) {
     glEnable(GL_DEPTH_TEST); // Depth Testing
     glDepthFunc(GL_LEQUAL);
     glDisable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //glCullFace(GL_BACK);
     return window;
 }
 
