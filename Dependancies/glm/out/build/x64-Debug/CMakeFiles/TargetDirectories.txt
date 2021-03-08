@@ -1,0 +1,2 @@
+C:/Users/Archangel/source/repos/HelloGlut2/Dependancies/glm/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/Archangel/source/repos/HelloGlut2/Dependancies/glm/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir

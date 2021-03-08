@@ -149,10 +149,12 @@
   <ItemGroup>
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Matrices\Model.cpp" />
+    <ClCompile Include="src\Matrices\Perspective.cpp" />
+    <ClCompile Include="src\Matrices\View.cpp" />
     <ClCompile Include="src\MeshLoader.cpp" />
     <ClCompile Include="src\ShaderHandler.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
-    <ClCompile Include="src\Transformation.cpp" />
     <ClCompile Include="src\VertexArrayObj.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,11 +162,14 @@
     <Text Include="res\shaders\VertexShader.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\globals.h" />
     <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\Matrices\Model.h" />
+    <ClInclude Include="src\Matrices\Perspective.h" />
+    <ClInclude Include="src\Matrices\View.h" />
     <ClInclude Include="src\MeshLoader.h" />
     <ClInclude Include="src\ShaderHandler.h" />
     <ClInclude Include="src\VertexBuffer.h" />
-    <ClInclude Include="src\Transformation.h" />
     <ClInclude Include="src\VertexArrayObj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

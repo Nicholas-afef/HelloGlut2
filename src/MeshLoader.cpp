@@ -33,9 +33,9 @@ void MeshLoader::load2dFile(){
 		if (line.c_str()[0] == 'f') {
 			int x, y, z;
 			sscanf_s(line.c_str(), "f\t%d\t%d\t%d", &x, &y, &z);
-			indexData.push_back(x);
-			indexData.push_back(y);
-			indexData.push_back(z);
+			indexData.push_back(x-1);
+			indexData.push_back(y-1);
+			indexData.push_back(z-1);
 			std::cout << "f " << x << " " << y << " " << z << std::endl;
 		}
 	}

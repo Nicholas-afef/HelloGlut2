@@ -12,18 +12,37 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArrayObj.h"
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+#include "Matrices/Model.h"
+#include "Matrices/View.h"
+#include "Matrices/Perspective.h"
+#include "globals.h"
 
 void display(GLFWwindow*);
 GLFWwindow* windowInit(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT);
-static float rotAngle = 5;
+static void windowControls(GLFWwindow* window, int key, int scancode, int action, int mods); 
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+void reshape(ShaderHandler& shader);
+static void cursorPositionCallback(GLFWwindow* window, double xPos, double yPos);
+void keepTime();
+Model modelMatrix;
+View viewMatrix;
+Perspective perspectiveMatrix;
+float lastFrame = 0.0f; //records the previous frames value
+float deltaTime = 0.0f; //our change in time variable
+float lastX = SCREEN_WIDTH/2, lastY = SCREEN_HEIGHT/2; //default mouse position
 
 int main(int argc, char** argv) {
     GLFWwindow* window = windowInit(SCREEN_WIDTH, SCREEN_HEIGHT);
     if (glewInit() != GLEW_OK) {
         std::cout << "Glewinit error";
     }
+
+    //**Put all GL settings here**
+    glEnable(GL_DEPTH_TEST); // Depth Testing
+    glDepthFunc(GL_LEQUAL);
+    //glDisable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+
     if (window != NULL){
         display(window);
     }
@@ -35,34 +54,26 @@ int main(int argc, char** argv) {
 void display(GLFWwindow* window) {
 
     //this is currently the object we're displaying
-    MeshLoader mesh("mesh/cube.obj", 3);
+    MeshLoader mesh("mesh/cow.obj", 3);
 
     //these are our buffers the meshloader loads into to bind our vertices and indices
     VertexArrayObj vao(mesh.getVertexData(), mesh.vertexDataSize(), mesh.getIndexData(), mesh.indexDataSize());
 
-    //defines the attributes of our vertices in the buffer
-    //glEnableVertexAttribArray(0);
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-
+    //constructs the shaderHandler which loads our shader program
     ShaderHandler shaderHandler;
     shaderHandler.useShader();
+    //sets color of our object
     shaderHandler.setUni4f("inColor", 0.0f, 1.0f, 0.0f, 1.0f);
-    shaderHandler.setView(glm::vec3(0, 0, 0), glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 1.0, 0.0));
-    shaderHandler.setPerspective(55.0, SCREEN_WIDTH, SCREEN_HEIGHT, 1.0, 50.0);
-    shaderHandler.setTranslate(glm::vec3(0.0, 0.0, -1.0));
-    //modify our view to match our object
-    /* Loop until the user closes the window */
 
    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)){
+        keepTime(); //calculates the length of time the previous frame took for our deltaTime
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
-        shaderHandler.setRotate(rotAngle, glm::vec3(1.0, 1.0, 1.0));
-        shaderHandler.updateModelView();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        
+        reshape(shaderHandler);
         glDrawElements(GL_TRIANGLES, mesh.indexDataSize(), GL_UNSIGNED_INT, (void*)0);
-        rotAngle += 0.0;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -83,7 +94,7 @@ GLFWwindow* windowInit(int width, int height) {
         return NULL;
     }
 
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello World", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Obj Loader", NULL, NULL);
 
     if (!window){
         std::cout << "failstate: window failed to initialize";
@@ -92,11 +103,94 @@ GLFWwindow* windowInit(int width, int height) {
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetKeyCallback(window, windowControls);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetCursorPosCallback(window, cursorPositionCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    glEnable(GL_DEPTH_TEST); // Depth Testing
-    glDepthFunc(GL_LEQUAL);
-    glDisable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
     return window;
 }
 
+static void windowControls(GLFWwindow* window, int key, int scancode, int action, int mods){
+    float cameraSpeed = 10.0f * deltaTime;
+    switch (key){
+    case GLFW_KEY_ESCAPE:
+        glfwSetWindowShouldClose(window, GL_TRUE);
+        break;
+    case GLFW_KEY_W:
+        //move given units (camera speed) in the directing we (the camera) are facing
+        viewMatrix.moveForward(cameraSpeed);
+        break;
+    case GLFW_KEY_A:
+        //move given units orthogonal to the direction we're facing
+        viewMatrix.moveLeft(cameraSpeed);
+        break;
+    case GLFW_KEY_S:
+        //move given units opposite the direction we're facing
+        viewMatrix.moveBackward(cameraSpeed);
+        break;
+    case GLFW_KEY_D:
+        //move given units orthogonal to the direction we're facing
+        viewMatrix.moveRight(cameraSpeed);
+        break;
+    case GLFW_KEY_SPACE:
+        //Vertical movement
+        viewMatrix.moveUp(cameraSpeed);
+        break;
+    case GLFW_KEY_LEFT_SHIFT:
+        viewMatrix.moveDown(cameraSpeed);
+        break;
+    case GLFW_KEY_E:
+        modelMatrix.rotateObject(2.0f);
+        break;
+    case GLFW_KEY_Q:
+        modelMatrix.rotateObject(-2.0f);
+        break;
+    case GLFW_KEY_1:
+        perspectiveMatrix.changeAngle(-1.0f);
+        break;
+    case GLFW_KEY_2:
+        perspectiveMatrix.changeAngle(1.0f);
+        break;
+    case GLFW_KEY_3:
+        perspectiveMatrix.moveNearPlane(-.1f);
+        break;
+    case GLFW_KEY_4:
+        perspectiveMatrix.moveNearPlane(.1f);
+        break;
+    case GLFW_KEY_5:
+        perspectiveMatrix.moveFarPlane(-.1f);
+        break;
+    case GLFW_KEY_6:
+        perspectiveMatrix.moveFarPlane(.1f);
+        break;
+    }
+
+}
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height){
+    glViewport(0, 0, width, height);
+}
+
+static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos){
+    float xOffset = xpos - lastX;
+    float yOffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+    viewMatrix.calcDirections(xOffset, yOffset);
+}
+
+void reshape(ShaderHandler& shader) {
+    glm::mat4 perspective = perspectiveMatrix.getPerspective(SCREEN_WIDTH / SCREEN_HEIGHT);
+    glm::mat4 modelView;
+    modelView = viewMatrix.getView() * modelMatrix.getModel();
+    //send our new shape structure to our shader for rendering
+    shader.setMat4f("perspectiveMatrix", perspective);
+    shader.setMat4f("modelViewMatrix", modelView);
+}
+
+void keepTime() {
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+}
