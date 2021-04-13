@@ -26,9 +26,9 @@ void reshape(ShaderHandler&);
 void reshapeLight(ShaderHandler&);
 static void cursorPositionCallback(GLFWwindow* window, double xPos, double yPos);
 void keepTime();
-Model modelMatrix, lightModel;
-View viewMatrix, lightView;
-Perspective perspectiveMatrix, lightPerspective;
+Model modelMatrix;
+View viewMatrix;
+Perspective perspectiveMatrix;
 float lastFrame = 0.0f; //records the previous frames value
 float deltaTime = 0.0f; //our change in time variable
 float lastX = SCREEN_WIDTH/2, lastY = SCREEN_HEIGHT/2; //default mouse position
@@ -60,44 +60,51 @@ void display(GLFWwindow* window) {
     //this is currently the object we're displaying
     MeshLoader meshes("resources/mesh/cow.obj", 3);
     meshes.load3dFile("resources/mesh/cube.obj");
-    std::cout << "calculating surface normals..." << std::endl;
     meshes.calcSurfaceNormals();
-
-    std::cout << "calculating vertex normals..." << std::endl;
     meshes.calcVertexNormals();
+    //meshes.printVertexData();
+    //meshes.printIndexData();
 
     //these are our buffers the meshloader loads into to bind our vertices and indices
     VertexArrayObj vao(meshes);
 
     TextureBuffer texture(CHECKER_TEXTURE);
-    texture.bind();
 
     //constructs the shaderHandler which loads our shader program
     ShaderHandler objShader(OBJ_VERTEX_SHADER_PATH, OBJ_FRAGMENT_SHADER_PATH);
     ShaderHandler lightingShader(LIGHT_VERTEX_SHADER_PATH, LIGHT_FRAGMENT_SHADER_PATH);
 
-
     //---------preloop transformations and calculations---------
     objShader.useShader();
-    objShader.setMat4f("normalMatrix", glm::transpose(glm::inverse(modelMatrix.getModel())));
-    objShader.setUni3f("objColor", 1.0f, 0.5f, .31f);
-    objShader.setUni3f("lightColor", 1.0f, 1.0f, 1.0f);
-    objShader.setUni1i("texture", 0);
+    glm::mat4 normalMatrix = glm::transpose(glm::inverse(modelMatrix.getModel()));
+    objShader.setUni1i("material.u_Texture", 0);
 
-    lightModel.setPosition(glm::vec3(8.0, 8.0, 8.0));
    //----------Main Drawing Loop----------------------
     while (!glfwWindowShouldClose(window)){
         keepTime(); //calculates the length of time the previous frame took for our deltaTime
         /* Render here */
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //set standard uniform info
+        objShader.useShader();
+        objShader.setUni3f("light.position", glm::vec3(3.2f, 5.0f, 4.0f));
+        objShader.setUni3f("viewPos", viewMatrix.getPosition());
 
+        objShader.setUni3f("light.ambient", 0.4f, 0.4f, 0.4f);
+        objShader.setUni3f("light.diffuse", 0.6f, 0.6f, 0.6f);
+        objShader.setUni3f("light.specular", 1.0f, 1.0f, 1.0f);
+        objShader.setUni1f("material.shininess", 32.0f);
+
+        objShader.setMat4f("normalMatrix", glm::transpose(glm::inverse(modelMatrix.getModel())));
+        
         reshape(objShader);
+        texture.bind();
         vao.bind();
         glDrawElements(GL_TRIANGLES, meshes.getIndexOffsetData()[1], GL_UNSIGNED_INT, (void*)meshes.getOffsetPosition(0));
 
-        //reshapeLight(lightingShader);
-        //vao.bind();
+        reshapeLight(lightingShader);
+        //texture.unbind();
         glDrawElements(GL_TRIANGLES, meshes.getIndexOffsetData()[2], GL_UNSIGNED_INT, (void*)meshes.getOffsetPosition(1));
 
         /* Swap front and back buffers */
@@ -212,18 +219,19 @@ void reshape(ShaderHandler& shader) {
     glm::mat4 modelView;
     modelView = viewMatrix.getView() * modelMatrix.getModel();
     //send our new shape structure to our shader for rendering
+    glm::vec3 viewPosition = viewMatrix.getPosition();
     shader.setMat4f("perspectiveMatrix", perspective);
     shader.setMat4f("modelViewMatrix", modelView);
 }
 
 void reshapeLight(ShaderHandler& shader) {
     shader.useShader();
-    glm::mat4 perspective = lightPerspective.getPerspective(SCREEN_WIDTH / SCREEN_HEIGHT);
-    glm::mat4 modelView;
-    modelView = lightView.getView() * lightModel.getModel();
-    //send our new shape structure to our shader for rendering
-    shader.setMat4f("lightPerspective", perspective);
-    shader.setMat4f("lightModelview", modelView);
+    shader.setMat4f("lightPerspective", perspectiveMatrix.getPerspective(SCREEN_WIDTH / SCREEN_HEIGHT));
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(3.2f, 5.0f, 6.0f));
+    model = glm::scale(model, glm::vec3(0.4f)); // a smaller cube
+    glm::mat4 modelView = viewMatrix.getView() * model;
+    shader.setMat4f("lightModelView", modelView);
 }
 
 void keepTime() {

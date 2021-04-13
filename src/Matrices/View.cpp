@@ -9,6 +9,10 @@ View::View(){
 	sensitivity = 0.1f;
 }
 
+glm::vec3 View::getPosition() {
+	return position;
+}
+
 void View::setCamera(glm::vec3 const& pos, glm::vec3 const& point, glm::vec3 const& up){
 	position = pos;
 	pointVector = point;

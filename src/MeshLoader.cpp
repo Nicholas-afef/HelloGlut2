@@ -45,7 +45,7 @@ void MeshLoader::load2dFile(const std::string& file){
 	}
 	//these next two lines accomplish some important book-keeping for later
 	//vertex counts stores the number of vertices for our loaded object. this is so when we load the next object, its index starts at the next set of vertices
-	vertexOffsets.push_back((vertexData.size() / 5));
+	vertexOffsets.push_back((vertexData.size() / 4));
 	//the index buffer offsets are used for draw calls to determine the indices required for a particular draw call
 	//we could perform one big drawcall, but by tracking the offsets, we should be able to perform matrix operations on individual draw calls.
 	indexCounts.push_back(indexData.size());
@@ -75,6 +75,8 @@ void MeshLoader::load3dFile(const std::string& file) {
 			vertexData.push_back(0);
 
 			//add our texture information to our object's data
+			tX = fmodf(abs(x), 1);
+			tY = fmodf(abs(y), 1);
 			vertexData.push_back(tX);
 			vertexData.push_back(tY);
 			//std::cout << "v " << x << " " << y << " " << z << " vt " << tX << " " << tY << std::endl;
@@ -98,8 +100,8 @@ void MeshLoader::load3dFile(const std::string& file) {
 	//we could perform one big drawcall, but by tracking the offsets, we should be able to perform matrix operations on individual draw calls.
 	indexCounts.push_back(indexData.size() - indexCounts.back());
 	std::cout << "object loaded successfully" << std::endl;
-	std::cout << "current total vertices: " << vertexData.size() << std::endl;
-	std::cout << "current total Indices: " << indexData.size() << std::endl;
+	std::cout << "current total vertices: " << (vertexData.size() / sizeof(float)) << std::endl;
+	std::cout << "current total Indices: " << indexCounts.back()<< std::endl;
 	std::cout << "object vertex count: " << vertexOffsets.back() << std::endl;
 	std::cout << "object index count: " << indexCounts.back() << std::endl;
 }
@@ -136,18 +138,31 @@ void MeshLoader::toString() {
 	std::cout << indexDataSize() << std::endl;
 }
 
+void MeshLoader::printVertexData() {
+	for (unsigned int x = 0; x < vertexData.size(); x+=8) {
+		std::cout << "Vertex #" << (x / 8) << " ";
+		std::cout << "v " << vertexData[x] << " " << vertexData[x+1] << " " << vertexData[x+2];
+		std::cout << " n " << vertexData[x + 3] << " " << vertexData[x + 4] << " " << vertexData[x + 5];
+		std::cout << " vt " << vertexData[x + 6] << " " << vertexData[x + 7] << std::endl;
+	}
+}
+void MeshLoader::printIndexData() {
+	for (unsigned int x = 0; x < indexData.size(); x += 3) {
+		std::cout << "f " << indexData[x] << " " << indexData[x + 1] << " " << indexData[x + 2] << std::endl;
+	}
+}
 void MeshLoader::calcSurfaceNormals() {
 	std::cout << "calculating surface normals..." << std::endl;
-	for (int x = 0; x < indexData.size(); x += 3) {
+	for (unsigned int x = 0; x < indexData.size(); x += 3) {
 		//define our 3 vertices based on their x, y, z coordinates
-		glm::vec3 vA(vertexData.at(indexData[x] * 5), vertexData.at((indexData[x] * 5) + 1), vertexData.at((indexData[x] * 5) + 2));
-		glm::vec3 vB(vertexData.at(indexData[x+1] * 5), vertexData.at((indexData[x+1] * 5) + 1), vertexData.at((indexData[x+1] * 5) + 2));
-		glm::vec3 vC(vertexData.at(indexData[x+2] * 5), vertexData.at((indexData[x+2] * 5) + 1), vertexData.at((indexData[x+2] * 5) + 2));
+		glm::vec3 vA(vertexData.at(indexData[x] * 8), vertexData.at((indexData[x] * 8) + 1), vertexData.at((indexData[x] * 8) + 2));
+		glm::vec3 vB(vertexData.at(indexData[x+1] * 8), vertexData.at((indexData[x+1] * 8) + 1), vertexData.at((indexData[x+1] * 8) + 2));
+		glm::vec3 vC(vertexData.at(indexData[x+2] * 8), vertexData.at((indexData[x+2] * 8) + 1), vertexData.at((indexData[x+2] * 8) + 2));
 
 		//calculate their respective vectors
 		glm::vec3 u = vB - vA;
 		glm::vec3 v = vC - vA;
-
+		//std::cout << "{" << u.x << " " << u.y << u.z << "} X {" << v.x << " " << v.y << " " << v.z << std::endl;
 		//insert a surface normal for our triangle
 		surfaceNormals.push_back(glm::normalize(glm::cross(u, v)));
 	}
@@ -174,25 +189,26 @@ void MeshLoader::calcVertexNormals() {
 			counts.insert(it, std::pair<int, unsigned int>(targ, 1));
 		}
 		//add the surface normals of the index to the vertex normals
+		//std::cout << "index " << i << " Norms{" << surfaceNormals[i/3].x << " " << surfaceNormals[i/3].y << " " << surfaceNormals[i/3].z << "}" << std::endl;
 		vertexData[(targ * 8) + 3] += surfaceNormals.at(i / 3).x;
 		vertexData[(targ * 8) + 4] += surfaceNormals.at(i / 3).y;
 		vertexData[(targ * 8) + 5] += surfaceNormals.at(i / 3).z;
 	}
 
-	for (int x = 0; x < vertexData.size(); x++) {
+	for (unsigned int x = 0; x < vertexData.size(); x++) {
 		//this amount can never be 0, if it was, it simply wouldn't be in the map
 		if (counts[x] != 0) {
 			//this if statement was apparently necessary to account for unused vertices...
-			std::cout << "vertex #" << x << "  count: " << counts[x] << std::endl;
-			float val = 1 / counts[x];
-			glm::vec3 vNormal(vertexData[x * 8 + 3], vertexData[x * 8 + 4], vertexData[x * 8 + 5]);
+			float val = 1.0f / counts[x];
+			glm::vec3 vNormal(vertexData[(x * 8) + 3], vertexData[(x * 8) + 4], vertexData[(x * 8) + 5]);
 			//average our sum by dividing the summed vNormal by the number of surface normals adjacent to the given vertice
+			//std::cout << "vnorms{" << vNormal.x << " " << vNormal.y << " " << vNormal.z << "} / " << val << std::endl;
 			vNormal = glm::normalize(vNormal * val);
 
 			//set our vertex normals data;
-			vertexData[x * 8 + 3] = vNormal.x;
-			vertexData[x * 8 + 4] = vNormal.y;
-			vertexData[x * 8 + 5] = vNormal.z;
+			vertexData[(x * 8) + 3] = vNormal.x;
+			vertexData[(x * 8) + 4] = vNormal.y;
+			vertexData[(x * 8) + 5] = vNormal.z;
 		}
 	}
 }

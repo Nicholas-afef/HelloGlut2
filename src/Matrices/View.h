@@ -17,6 +17,7 @@ public:
 	void setPointVector(glm::vec3 const&);
 	void setUpVector(glm::vec3 const&);
 	glm::mat4 getView();
+	glm::vec3 getPosition();
 	void calcDirections(float, float);
 	void moveForward(float speed);
 	void moveBackward(float speed);

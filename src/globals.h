@@ -1,7 +1,7 @@
 #pragma once
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-const float PI = 3.14159;
+const float PI = 3.14159f;
 const std::string OBJ_VERTEX_SHADER_PATH = "res/shaders/VertexShader.glsl";
 const std::string OBJ_FRAGMENT_SHADER_PATH = "res/shaders/FragmentShader.glsl";
 const std::string LIGHT_VERTEX_SHADER_PATH = "res/shaders/LightingVertexShader.glsl";

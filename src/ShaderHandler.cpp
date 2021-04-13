@@ -87,6 +87,10 @@
         glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
     }
 
+    void ShaderHandler::setUni1f(const std::string& name, float value) const {
+        glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
+    }
+
     void ShaderHandler::setUni3f(const std::string& name, float v1, float v2, float v3) const {
         glUniform3f(glGetUniformLocation(shaderProgram, name.c_str()), v1, v2, v3);
     }
@@ -96,6 +100,10 @@
         glUniform4f(glGetUniformLocation(shaderProgram, name.c_str()), v1, v2, v3, v4);
     }
     
+    void ShaderHandler::setUni3f(const std::string& name, glm::vec3 vector) const {
+        glUniform3f(glGetUniformLocation(shaderProgram, name.c_str()), vector.x, vector.y, vector.z);
+    }
+
     void ShaderHandler::setMat4f(const std::string& name, glm::mat4 matrix) {
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
     }

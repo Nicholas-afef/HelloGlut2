@@ -31,7 +31,8 @@ public:
 	int vertexDataSize();
 	int indexDataSize();
 	void toString();
-
+	void printVertexData();
+	void printIndexData();
 	void calcSurfaceNormals();
 	void calcVertexNormals();
 };

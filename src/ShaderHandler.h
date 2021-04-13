@@ -34,6 +34,8 @@ public:
 	void useShader();
 	void setBool(const std::string&, bool) const;
 	void setUni1i(const std::string&, int) const;
+	void setUni1f(const std::string&, float) const;
+	void setUni3f(const std::string&, glm::vec3) const;
 	void setUni3f(const std::string&, float, float, float) const;
 	void setUni4f(const std::string&, float,float,float,float) const;
 	void setMat4f(const std::string& name, glm::mat4 matrix);

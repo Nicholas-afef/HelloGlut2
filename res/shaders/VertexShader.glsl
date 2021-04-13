@@ -34,7 +34,7 @@ void main(){
     //projectionMatrix: moves the vertex to clip space screen co-ords
 
     gl_Position = perspectiveMatrix * modelViewMatrix * vec4(aPos,1.0);
-    v_TexCoord = texCoord; 
+    v_TexCoord = texCoord;
     fragPosition = vec3(normalMatrix * vec4(aPos,1.0));
     normal = aNorms;
 };
