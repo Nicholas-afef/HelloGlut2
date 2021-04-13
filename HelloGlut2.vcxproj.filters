@@ -42,10 +42,18 @@
     <ClCompile Include="src\Matrices\View.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextureBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imports\stb_image\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="res\shaders\FragmentShader.txt" />
-    <Text Include="res\shaders\VertexShader.txt" />
+    <Text Include="res\shaders\FragmentShader.glsl" />
+    <Text Include="res\shaders\VertexShader.glsl" />
+    <Text Include="res\shaders\LightingShader.glsl" />
+    <Text Include="res\shaders\LightingVertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ShaderHandler.h">
@@ -73,6 +81,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imports\stb_image\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

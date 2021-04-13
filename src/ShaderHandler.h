@@ -26,14 +26,15 @@ private:
 	glm::mat4 translator, rotator, scalar, view, perspective;
 public:
 	ShaderHandler* shaderHandler;
-	ShaderHandler();
+	ShaderHandler(std::string, std::string);
 	~ShaderHandler();
 	unsigned int compileShader(unsigned int, const std::string&);
 	unsigned int createShader();
 	unsigned int getProgram();
 	void useShader();
 	void setBool(const std::string&, bool) const;
-	void setInt(const std::string&, int) const;
+	void setUni1i(const std::string&, int) const;
+	void setUni3f(const std::string&, float, float, float) const;
 	void setUni4f(const std::string&, float,float,float,float) const;
 	void setMat4f(const std::string& name, glm::mat4 matrix);
 };

@@ -1,5 +1,5 @@
 #include "IndexBuffer.h"
-IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int c) {
+IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int c, const std::vector<unsigned int> &offsets) {
     count = c;
     std::cout << "index buffer size: " << c << std::endl;
     glGenBuffers(1, &indexBufferId);

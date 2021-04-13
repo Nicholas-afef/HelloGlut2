@@ -1,8 +1,8 @@
 #include "ShaderHandler.h"
 
-    ShaderHandler::ShaderHandler() {
-        vertexShader = parseShader("res/shaders/VertexShader.txt");
-        fragmentShader = parseShader("res/shaders/FragmentShader.txt");
+    ShaderHandler::ShaderHandler(std::string vertex, std::string frag) {
+        vertexShader = parseShader(vertex);
+        fragmentShader = parseShader(frag);
         shaderProgram = createShader();
         translator = glm::mat4(1.0f);
         rotator = glm::mat4(1.0f);
@@ -82,9 +82,13 @@
         glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), (int)value);
     }
 
-    void ShaderHandler::setInt(const std::string& name, int value) const{
+    void ShaderHandler::setUni1i(const std::string& name, int value) const{
         //utility function for redefining integer uniforms in our shader
         glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
+    }
+
+    void ShaderHandler::setUni3f(const std::string& name, float v1, float v2, float v3) const {
+        glUniform3f(glGetUniformLocation(shaderProgram, name.c_str()), v1, v2, v3);
     }
 
     void ShaderHandler::setUni4f(const std::string& name, float v1, float v2, float v3, float v4) const{

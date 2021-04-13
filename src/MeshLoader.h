@@ -5,23 +5,34 @@
 #include <sstream>
 #include <iostream>
 #include <GL/glew.h>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 
 class MeshLoader{
 private:
 	std::vector<float> vertexData;
 	std::vector<unsigned int> indexData;
-	std::string file;
+	std::vector<std::string> files;
+	std::vector<unsigned int> indexCounts;
+	std::vector<unsigned int> vertexOffsets;
+	std::vector<glm::vec3> surfaceNormals;
+
 public:
 	MeshLoader(const std::string&, int);
 	~MeshLoader();
 
-	void reload(const std::string&);
-	void load2dFile();
-	void load3dFile();
+	void load2dFile(const std::string&);
+	void load3dFile(const std::string&);
 	float* getVertexData();
 	unsigned int* getIndexData();
+	std::vector<unsigned int>& getIndexOffsetData();
+	int getOffsetPosition(unsigned int);
 	int vertexDataSize();
 	int indexDataSize();
 	void toString();
+
+	void calcSurfaceNormals();
+	void calcVertexNormals();
 };
 

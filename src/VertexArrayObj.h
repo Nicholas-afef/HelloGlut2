@@ -1,6 +1,8 @@
 #pragma once
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "MeshLoader.h"
+#include <vector>
 
 class VertexArrayObj{
 private:
@@ -8,7 +10,7 @@ private:
 	IndexBuffer ibo;
 	unsigned int vao;
 public:
-	VertexArrayObj(const void*, unsigned int, const unsigned int* , int);
+	VertexArrayObj(MeshLoader&);
 	~VertexArrayObj();
 
 	void bind();

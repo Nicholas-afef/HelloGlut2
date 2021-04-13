@@ -37,14 +37,14 @@ void Perspective::moveNearPlane(float n) {
 	if (nearPlane < .1f) {
 		nearPlane = .1f;
 	}
-	if (nearPlane > farPlane) {
+	if (nearPlane > (farPlane - 1.0f)) {
 		nearPlane = farPlane - 1.0f;
 	}
 }
 
 void Perspective::moveFarPlane(float n) {
 	farPlane += n;
-	if (farPlane < nearPlane) {
+	if (farPlane < (nearPlane + 1.0f)) {
 		farPlane = nearPlane + 1.0f;
 	}
 	if (farPlane > 100.0f) {

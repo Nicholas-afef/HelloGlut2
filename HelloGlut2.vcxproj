@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\imports\stb_image\stb_image.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Matrices\Model.cpp" />
@@ -156,13 +157,17 @@
     <ClCompile Include="src\ShaderHandler.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\VertexArrayObj.cpp" />
+    <ClCompile Include="src\TextureBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="res\shaders\FragmentShader.txt" />
-    <Text Include="res\shaders\VertexShader.txt" />
+    <Text Include="res\shaders\FragmentShader.glsl" />
+    <Text Include="res\shaders\LightingShader.glsl" />
+    <Text Include="res\shaders\LightingVertexShader.glsl" />
+    <Text Include="res\shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\globals.h" />
+    <ClInclude Include="src\imports\stb_image\stb_image.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\Matrices\Model.h" />
     <ClInclude Include="src\Matrices\Perspective.h" />
@@ -171,6 +176,7 @@
     <ClInclude Include="src\ShaderHandler.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexArrayObj.h" />
+    <ClInclude Include="src\TextureBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
