@@ -203,8 +203,8 @@ void MeshLoader::calcVertexNormals() {
 			glm::vec3 vNormal(vertexData[(x * 8) + 3], vertexData[(x * 8) + 4], vertexData[(x * 8) + 5]);
 			//average our sum by dividing the summed vNormal by the number of surface normals adjacent to the given vertice
 			//std::cout << "vnorms{" << vNormal.x << " " << vNormal.y << " " << vNormal.z << "} / " << val << std::endl;
-			vNormal = glm::normalize(vNormal * val);
-
+			vNormal = vNormal * val;
+			std::cout << "normal " << x << " --- " << vNormal.x << " " << vNormal.y << " " << vNormal.z << std::endl;
 			//set our vertex normals data;
 			vertexData[(x * 8) + 3] = vNormal.x;
 			vertexData[(x * 8) + 4] = vNormal.y;

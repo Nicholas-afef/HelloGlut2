@@ -29,6 +29,9 @@ void keepTime();
 Model modelMatrix;
 View viewMatrix;
 Perspective perspectiveMatrix;
+TextureBuffer cowTexture;
+TextureBuffer checkerTexture;
+bool textureSwap = false;
 float lastFrame = 0.0f; //records the previous frames value
 float deltaTime = 0.0f; //our change in time variable
 float lastX = SCREEN_WIDTH/2, lastY = SCREEN_HEIGHT/2; //default mouse position
@@ -68,11 +71,13 @@ void display(GLFWwindow* window) {
     //these are our buffers the meshloader loads into to bind our vertices and indices
     VertexArrayObj vao(meshes);
 
-    TextureBuffer texture(CHECKER_TEXTURE);
-
     //constructs the shaderHandler which loads our shader program
     ShaderHandler objShader(OBJ_VERTEX_SHADER_PATH, OBJ_FRAGMENT_SHADER_PATH);
     ShaderHandler lightingShader(LIGHT_VERTEX_SHADER_PATH, LIGHT_FRAGMENT_SHADER_PATH);
+
+    //initialize our textures
+    cowTexture.loadTexture(COW_TEXTURE);
+    checkerTexture.loadTexture(CHECKER_TEXTURE);
 
     //---------preloop transformations and calculations---------
     objShader.useShader();
@@ -91,15 +96,23 @@ void display(GLFWwindow* window) {
         objShader.setUni3f("light.position", glm::vec3(3.2f, 5.0f, 4.0f));
         objShader.setUni3f("viewPos", viewMatrix.getPosition());
 
-        objShader.setUni3f("light.ambient", 0.4f, 0.4f, 0.4f);
-        objShader.setUni3f("light.diffuse", 0.6f, 0.6f, 0.6f);
+        objShader.setUni3f("light.ambient", 0.1f, 0.1f, 0.1f);
+        objShader.setUni3f("light.diffuse", 0.4f, 0.4f, 0.4f);
         objShader.setUni3f("light.specular", 1.0f, 1.0f, 1.0f);
         objShader.setUni1f("material.shininess", 32.0f);
 
         objShader.setMat4f("normalMatrix", glm::transpose(glm::inverse(modelMatrix.getModel())));
         
         reshape(objShader);
-        texture.bind();
+        if (textureSwap) {
+            cowTexture.unbind();
+            checkerTexture.bind();
+        }
+        else {
+            checkerTexture.unbind();
+            cowTexture.bind();
+        }
+
         vao.bind();
         glDrawElements(GL_TRIANGLES, meshes.getIndexOffsetData()[1], GL_UNSIGNED_INT, (void*)meshes.getOffsetPosition(0));
 
@@ -146,7 +159,7 @@ GLFWwindow* windowInit(int width, int height) {
 
 static void windowControls(GLFWwindow* window, int key, int scancode, int action, int mods){
     float cameraSpeed = 10.0f * deltaTime;
-    switch (key){
+    switch (key) {
     case GLFW_KEY_ESCAPE:
         glfwSetWindowShouldClose(window, GL_TRUE);
         break;
@@ -197,8 +210,16 @@ static void windowControls(GLFWwindow* window, int key, int scancode, int action
     case GLFW_KEY_6:
         perspectiveMatrix.moveFarPlane(.1f);
         break;
+    case GLFW_KEY_T:
+        if (textureSwap) {
+            textureSwap = false;
+        }
+        else {
+            textureSwap = true;
+        }
+        break;
     }
-
+        
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height){

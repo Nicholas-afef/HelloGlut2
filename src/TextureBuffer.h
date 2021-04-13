@@ -8,9 +8,10 @@ private:
 	unsigned char* localBuffer;
 	int width, height, bitsPerPixel;
 public:
+	TextureBuffer();
 	TextureBuffer(const std::string& path);
 	~TextureBuffer();
-
+	void loadTexture(const std::string&);
 	void bind(unsigned int slot = 0) const;
 	void unbind() const;
 

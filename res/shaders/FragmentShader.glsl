@@ -26,16 +26,17 @@ void main(){
     vec3 ambient = light.ambient * texture(material.u_Texture, v_TexCoord).rgb;
 
     //calculate diffusion light
+    
     vec3 norm = normalize(normal);
     vec3 lightdir = normalize(light.position - fragPosition);
-    float diffScalar = max(dot(norm,lightdir),0.0);
+    float diffScalar = max(dot(normal,lightdir),0.0);
     vec3 diffuse = light.diffuse * diffScalar * texture(material.u_Texture, v_TexCoord).rgb;
 
-    vec3 viewDir = normalize(viewPosition - fragPosition);
-    vec3 reflectDir = reflect(lightdir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shine);
-    vec3 specular = light.specular * spec * texture(material.u_Texture, v_TexCoord).rgb;
+    vec3 viewDir = normalize(viewPosition - fragPosition); //V
+    vec3 reflectDir = reflect(lightdir, -normal); //Reflect about l norm
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shine); //  (r dot v) pow shininess
+    vec3 specular = light.specular * spec * texture(material.u_Texture, v_TexCoord).rgb; //k
 
-    vec3 result = ambient + diffuse + specular;
+    vec3 result = ambient + diffuse;
     FragColor = vec4(result, 1.0);
 };

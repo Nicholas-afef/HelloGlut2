@@ -1,9 +1,12 @@
 #include "TextureBuffer.h"
 #include "imports/stb_image/stb_image.h"
+TextureBuffer::TextureBuffer() {}
 
 TextureBuffer::TextureBuffer(const std::string& path)
     :textureBufferId(0), filePath(path), localBuffer(nullptr), width(0), height(0), bitsPerPixel(0){
-   
+    loadTexture(path);
+}
+void TextureBuffer::loadTexture(const std::string& path) {
     //load our image using the imported stbi_image.h
     stbi_set_flip_vertically_on_load(1);
     localBuffer = stbi_load(path.c_str(), &width, &height, &bitsPerPixel, 4);
